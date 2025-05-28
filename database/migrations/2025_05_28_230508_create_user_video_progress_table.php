@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('role_user', function (Blueprint $table) {
-            $table->id();
+        Schema::create('user_video_progress', function (Blueprint $table) {
+            $table->uuid('progress_id')->primary();
             $table->foreignUuid('user_id')->constrained('users', 'user_id')->cascadeOnDelete();
-            $table->foreignUuid('role_id')->constrained('roles', 'role_id')->cascadeOnDelete();
+            $table->foreignUuid('video_id')->constrained('videos', 'video_id')->cascadeOnDelete();
+            $table->boolean('is_completed')->default(false);
+            $table->timestamp('last_watched_time')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('role_user');
+        Schema::dropIfExists('user_video_progress');
     }
 };

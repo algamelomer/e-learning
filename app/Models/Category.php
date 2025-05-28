@@ -4,24 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class Role extends Model
+class Category extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $primaryKey = 'role_id';
+    protected $primaryKey = 'category_id';
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
-        'name',
-        'description'
+        'category_name',
+        'description',
     ];
 
-    public function users(): BelongsToMany
+    public function courses()
     {
-        return $this->belongsToMany(User::class, 'role_user', 'role_id', 'user_id');
+        return $this->hasMany(Course::class, 'category_id');
     }
 }

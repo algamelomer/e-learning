@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('role_user', function (Blueprint $table) {
-            $table->id();
+        Schema::create('certificates', function (Blueprint $table) {
+            $table->uuid('certificate_id')->primary();
             $table->foreignUuid('user_id')->constrained('users', 'user_id')->cascadeOnDelete();
-            $table->foreignUuid('role_id')->constrained('roles', 'role_id')->cascadeOnDelete();
+            $table->foreignUuid('course_id')->constrained('courses', 'course_id')->cascadeOnDelete();
+            $table->timestamp('issue_date')->useCurrent();
+            $table->timestamp('expiry_date')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('role_user');
+        Schema::dropIfExists('certificates');
     }
 };

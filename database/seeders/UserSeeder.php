@@ -2,11 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Role;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class UserSeeder extends Seeder
 {
@@ -15,31 +18,65 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create admin user
-        $adminUser = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password123')
-        ]);
+        Schema::disableForeignKeyConstraints();
+        User::truncate();
+        DB::table('role_user')->truncate();
+        Schema::enableForeignKeyConstraints();
 
-        // Create regular user
-        $regularUser = User::create([
-            'name' => 'Regular User',
-            'email' => 'user@example.com',
-            'password' => Hash::make('password123')
-        ]);
+        $adminRole = Role::where('name', 'Admin')->first();
+        $instructorRole = Role::where('name', 'Instructor')->first();
+        $studentRole = Role::where('name', 'Student')->first();
 
-        // Assign roles
-        $adminRole = Role::where('name', 'admin')->first();
-        $userRole = Role::where('name', 'user')->first();
-
-        if ($adminRole) {
-            $adminUser->roles()->attach($adminRole);
+        if (!$adminRole || !$instructorRole || !$studentRole) {
+            $this->command->error('Admin, Instructor, or Student role not found. Please run RoleSeeder first.');
+            return;
         }
 
-        if ($userRole) {
-            $regularUser->roles()->attach($userRole);
-            $adminUser->roles()->attach($userRole); // Admin also has user role
+        $adminUser = User::create([
+            'user_id' => Str::uuid()->toString(),
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $adminUser->roles()->attach($adminRole->role_id);
+
+        $instructorUser = User::create([
+            'user_id' => Str::uuid()->toString(),
+            'name' => 'Instructor User',
+            'email' => 'instructor@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $instructorUser->roles()->attach($instructorRole->role_id);
+
+        $studentUser = User::create([
+            'user_id' => Str::uuid()->toString(),
+            'name' => 'Student User',
+            'email' => 'student@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $studentUser->roles()->attach($studentRole->role_id);
+
+        // Create a few more students
+        for ($i = 1; $i <= 5; $i++) {
+            $student = User::create([
+                'user_id' => Str::uuid()->toString(),
+                'name' => 'Student ' . $i,
+                'email' => 'student' . $i . '@example.com',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $student->roles()->attach($studentRole->role_id);
         }
     }
 }

@@ -7,17 +7,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids;
+
+    protected $primaryKey = 'user_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -28,7 +33,7 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -50,11 +55,36 @@ class User extends Authenticatable
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
     }
 
     public function hasRole($role): bool
     {
         return $this->roles()->where('name', $role)->exists();
+    }
+
+    public function coursesAsInstructor()
+    {
+        return $this->hasMany(Course::class, 'instructor_id');
+    }
+
+    public function quizAttempts()
+    {
+        return $this->hasMany(QuizAttempt::class, 'user_id');
+    }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class, 'user_id');
+    }
+
+    public function userCourseProgress()
+    {
+        return $this->hasMany(UserCourseProgress::class, 'user_id');
+    }
+
+    public function userVideoProgress()
+    {
+        return $this->hasMany(UserVideoProgress::class, 'user_id');
     }
 }

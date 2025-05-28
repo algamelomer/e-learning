@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('role_user', function (Blueprint $table) {
-            $table->id();
+        Schema::create('user_course_progress', function (Blueprint $table) {
+            $table->uuid('user_course_id')->primary();
             $table->foreignUuid('user_id')->constrained('users', 'user_id')->cascadeOnDelete();
-            $table->foreignUuid('role_id')->constrained('roles', 'role_id')->cascadeOnDelete();
+            $table->foreignUuid('course_id')->constrained('courses', 'course_id')->cascadeOnDelete();
+            $table->float('completion_percentage')->default(0);
+            $table->timestamp('last_accessed')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('role_user');
+        Schema::dropIfExists('user_course_progress');
     }
 };
