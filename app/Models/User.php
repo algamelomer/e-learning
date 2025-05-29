@@ -41,6 +41,13 @@ class User extends Authenticatable
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['roles'];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -51,6 +58,19 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the user's roles.
+     */
+    public function getRolesAttribute()
+    {
+        // This ensures that the roles relationship is loaded and returned
+        // when 'roles' is in $appends. It will only be loaded if not already.
+        if (! $this->relationLoaded('roles')) {
+            $this->load('roles');
+        }
+        return $this->getRelation('roles');
     }
 
     public function roles(): BelongsToMany

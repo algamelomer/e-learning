@@ -249,7 +249,7 @@ th {
 }
 
 .action-btn.cancel {
-    background: #6b7280;
+    background: #6b7280; /* Gray */
     color: white;
 }
 
@@ -257,20 +257,34 @@ th {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1000;
 }
 
 .modal-content {
     background: white;
     padding: 2rem;
-    border-radius: 16px;
-    width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    min-width: 300px;
     max-width: 500px;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 }
 
 .form-group {
@@ -291,15 +305,6 @@ th {
     border-radius: 6px;
 }
 
-.form-group textarea {
-    min-height: 100px;
-    resize: vertical;
-}
+/* Ensure other styles are in place if needed for responsiveness or specific elements */
 
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
 </style>

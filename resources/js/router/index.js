@@ -1,14 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import Login from '../components/auth/Login.vue';
-import Register from '../components/auth/Register.vue';
-import Dashboard from '../components/Dashboard.vue';
-import UserManagement from '../components/admin/UserManagement.vue';
-import RoleManagement from '../components/admin/RoleManagement.vue';
+import Home from '../views/Home.vue';
+import Login from '../views/auth/LoginView.vue';
+import Register from '../views/auth/RegisterView.vue';
+import Dashboard from '../views/DashboardView.vue';
+import UserManagement from '../views/admin/UserManagement.vue';
+import RoleManagement from '../views/admin/RoleManagementView.vue';
+
+// Instructor Components
+import InstructorLayout from '../views/instructor/InstructorLayout.vue';
+import InstructorCoursesList from '../views/instructor/InstructorCoursesList.vue';
+import InstructorCourseForm from '../views/instructor/InstructorCourseForm.vue'; // Import actual component
 
 const routes = [{
         path: '/',
-        redirect: '/login'
+         name: 'home',
+        component: Home,
     },
     {
         path: '/login',
@@ -39,6 +46,33 @@ const routes = [{
         name: 'role-management',
         component: RoleManagement,
         meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    // Instructor Routes
+    {
+        path: '/instructor',
+        component: InstructorLayout, // Using a layout for instructor section
+        meta: { requiresAuth: true, requiresInstructor: true },
+        children: [{
+                path: '',
+                redirect: '/instructor/courses' // Default to courses list
+            },
+            {
+                path: 'courses',
+                name: 'instructor-courses',
+                component: InstructorCoursesList
+            },
+            {
+                path: 'courses/create',
+                name: 'instructor-course-create',
+                component: InstructorCourseForm
+            },
+            {
+                path: 'courses/:courseId/edit',
+                name: 'instructor-course-edit',
+                component: InstructorCourseForm,
+                props: true
+            }
+        ]
     }
 ];
 
@@ -51,6 +85,7 @@ router.beforeEach(async(to, from, next) => {
     const authStore = useAuthStore();
     const isAuthenticated = authStore.isAuthenticated;
     const isAdmin = authStore.isAdmin;
+    const isInstructor = authStore.isInstructor; // Get instructor status
 
     // Routes that require authentication
     if (to.meta.requiresAuth) {
@@ -61,7 +96,13 @@ router.beforeEach(async(to, from, next) => {
 
         // Check for admin routes
         if (to.meta.requiresAdmin && !isAdmin) {
-            next({ name: 'dashboard' });
+            next({ name: 'dashboard' }); // Or a 403 page
+            return;
+        }
+
+        // Check for instructor routes
+        if (to.meta.requiresInstructor && !isInstructor) {
+            next({ name: 'dashboard' }); // Or a 403 page
             return;
         }
     }

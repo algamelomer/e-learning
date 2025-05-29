@@ -12,8 +12,26 @@ export const useAuthStore = defineStore('auth', {
         isAuthenticated: (state) => !!state.token,
         getUser: (state) => state.user,
         isAdmin: (state) => {
-            if (!state.user || !state.user.roles) return false;
-            return state.user.roles.some(role => role.name === 'admin');
+            console.log('[AuthStore] isAdmin getter - state.user:', JSON.parse(JSON.stringify(state.user)));
+            if (!state.user || !state.user.roles) {
+                console.log('[AuthStore] isAdmin: User or user.roles is falsy');
+                return false;
+            }
+            console.log('[AuthStore] isAdmin - user.roles:', JSON.parse(JSON.stringify(state.user.roles)));
+            const hasAdminRole = state.user.roles.some(role => role.name === 'Admin');
+            console.log('[AuthStore] isAdmin - hasAdminRole:', hasAdminRole);
+            return hasAdminRole;
+        },
+        isInstructor: (state) => {
+            console.log('[AuthStore] isInstructor getter - state.user:', JSON.parse(JSON.stringify(state.user)));
+            if (!state.user || !state.user.roles) {
+                console.log('[AuthStore] isInstructor: User or user.roles is falsy');
+                return false;
+            }
+            console.log('[AuthStore] isInstructor - user.roles:', JSON.parse(JSON.stringify(state.user.roles)));
+            const hasInstructorRole = state.user.roles.some(role => role.name === 'Instructor');
+            console.log('[AuthStore] isInstructor - hasInstructorRole:', hasInstructorRole);
+            return hasInstructorRole;
         },
     },
 
@@ -79,6 +97,7 @@ export const useAuthStore = defineStore('auth', {
                 }
                 const response = await axios.get('/api/user');
                 this.user = response.data;
+                console.log('[AuthStore] fetchUser - response.data:', JSON.parse(JSON.stringify(response.data)));
                 localStorage.setItem('user', JSON.stringify(this.user));
                 return response;
             } catch (error) {
